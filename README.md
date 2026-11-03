@@ -6,6 +6,26 @@ The core contains CTAP command handling, CBOR encoding/decoding, PIN protocols a
 
 A complete authenticator requires platform providers. Supported features are advertised according to the providers configured by the application. See [integration](docs/integration.md) for the provider contracts and [releases](docs/releases.md) for dependency and compatibility policy.
 
+## Available hardware
+
+Use an existing hardware integration to build a complete Tunnlix Key:
+
+| Board | Microcontroller | Firmware and setup |
+| --- | --- | --- |
+| Seeed Studio XIAO RP2350 | Raspberry Pi RP2350 | [Firmware](https://github.com/Tunnlix/key-rp2350) · [Build and setup](https://github.com/Tunnlix/key-rp2350/blob/main/docs/building.md) |
+
+The XIAO reference setup uses an external user-presence button between D0 and GND.
+
+## Bring your own hardware
+
+Contributions that bring Tunnlix Key to more boards and microcontrollers are
+welcome. Reuse the protocol core and supply your platform's USB transport,
+cryptography, persistent storage, random generation and user-presence controls.
+Share what you are building and help expand the available hardware integrations.
+
+Start with the [integration guide](docs/integration.md). Hardware drivers, firmware
+updates, provisioning and secure boot belong to each platform's firmware project.
+
 ## Build
 
 ```sh
