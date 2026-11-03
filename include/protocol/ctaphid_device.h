@@ -59,6 +59,7 @@ typedef struct {
     CtaphidAbortReport abort_report;
     void *transport_context;
     bool asynchronous_transport;
+    uint8_t device_version[3]; /* Vendor product version for INIT, not core version. */
     CtaphidStartCbor start_cbor;
     CtaphidAbortCbor abort_cbor;
     void *cbor_context;

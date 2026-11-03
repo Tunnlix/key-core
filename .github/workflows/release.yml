@@ -1,0 +1,39 @@
+name: Prepare draft release
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing reviewed vMAJOR.MINOR.PATCH tag
+        required: true
+        type: string
+permissions:
+  contents: write
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Package tagged sources
+        env:
+          CORE_TAG: ${{ inputs.tag }}
+        run: python3 tools/package-release.py --tag "$CORE_TAG" --output build/release
+      - name: Check packaged sources
+        run: |
+          mkdir build/archive
+          tar -xzf build/release/key-core-*.tar.gz -C build/archive --strip-components=1
+          for complexity in ON OFF; do
+            cmake -S build/archive -B "build/check-$complexity" -DCMAKE_BUILD_TYPE=Release -DCTAP_PIN_COMPLEXITY="$complexity"
+            cmake --build "build/check-$complexity" --parallel 2
+            ctest --test-dir "build/check-$complexity" --output-on-failure
+          done
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CORE_TAG: ${{ inputs.tag }}
+        run: gh release create "$CORE_TAG" --verify-tag --draft --title "$CORE_TAG" --notes-file CHANGELOG.md build/release/key-core-*.tar.gz build/release/SHA256SUMS build/release/provenance.json

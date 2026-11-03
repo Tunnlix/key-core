@@ -75,4 +75,11 @@ CtaphidDispatchResult ctaphid_dispatch_message_with_capabilities(
     void *transport_context
 );
 
+/* Integrated variant with product-supplied INIT version bytes. NULL means 0.0.0;
+ * the core release version never determines the authenticator's identity. */
+CtaphidDispatchResult ctaphid_dispatch_message_with_identity(
+    CtaphidReassembler *message, CtaphidChannelManager *channels,
+    uint8_t capabilities, const uint8_t device_version[3],
+    CtaphidSendReport send_report, void *transport_context);
+
 #endif

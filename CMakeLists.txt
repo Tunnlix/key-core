@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(ctap_core VERSION 0.1.0 LANGUAGES C)
+project(key_core VERSION 1.0.0 LANGUAGES C)
 
 # Embed with add_subdirectory() and link ctap_core. The application supplies
 # clock, touch, crypto and storage callbacks; this target has no platform drivers.
@@ -42,6 +42,8 @@ add_library(ctap_core STATIC
     src/protocol/ctaphid_reassembler.c
     src/protocol/ctaphid_response.c
 )
+add_library(Tunnlix::KeyCore ALIAS ctap_core)
+set_property(TARGET ctap_core PROPERTY TUNNLIX_KEY_CORE_VERSION "${PROJECT_VERSION}")
 target_include_directories(ctap_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
 target_compile_features(ctap_core PUBLIC c_std_17)
 option(CTAP_PIN_COMPLEXITY "Support PIN complexity, enabled by default on new/reset devices" ON)
@@ -124,4 +126,10 @@ elseif(NOT CTAP_STACK_BUDGET_CHECKS)
     message(STATUS "Per-function stack budget diagnostics explicitly disabled; use ordinary builds for stack reports")
 else()
     message(STATUS "Stack budget check unavailable with ${CMAKE_C_COMPILER_ID}; use a GCC build for stack reports")
+endif()
+
+option(KEY_CORE_BUILD_TESTS "Build portable core checks" ${PROJECT_IS_TOP_LEVEL})
+if(KEY_CORE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(checks)
 endif()

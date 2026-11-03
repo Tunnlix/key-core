@@ -1,0 +1,23 @@
+name: Core checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+        complexity: [ON, OFF]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Configure
+        run: cmake -S . -B build/core -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCTAP_PIN_COMPLEXITY=${{ matrix.complexity }}
+      - name: Build
+        run: cmake --build build/core --parallel 2
+      - name: Check
+        run: ctest --test-dir build/core --output-on-failure

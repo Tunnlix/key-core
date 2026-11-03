@@ -12,6 +12,12 @@
  * request. CBOR execution and cancellation belong to the device/backend;
  * stateful LOCK ownership belongs to ctaphid_device, outside these handlers.
  */
+/* Product version is supplied by the integration. NULL means 0.0.0. */
+CtaphidResponseResult ctaphid_handle_init_with_version(
+    const CtaphidReassembler *message, uint32_t allocated_channel_id,
+    uint8_t capabilities, const uint8_t device_version[3],
+    CtaphidSendReport send_report, void *transport_context);
+/* Convenience variant with an unspecified (0.0.0) product version. */
 CtaphidResponseResult ctaphid_handle_init(
     const CtaphidReassembler *message,
     uint32_t allocated_channel_id,

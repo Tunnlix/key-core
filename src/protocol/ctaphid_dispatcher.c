@@ -16,10 +16,11 @@ static CtaphidDispatchResult finish_response(
         ? CTAPHID_DISPATCH_OK : CTAPHID_DISPATCH_RESPONSE_FAILED;
 }
 
-CtaphidDispatchResult ctaphid_dispatch_message_with_capabilities(
+CtaphidDispatchResult ctaphid_dispatch_message_with_identity(
     CtaphidReassembler *message,
     CtaphidChannelManager *channels,
     uint8_t capabilities,
+    const uint8_t device_version[3],
     CtaphidSendReport send_report,
     void *transport_context
 )
@@ -68,8 +69,8 @@ CtaphidDispatchResult ctaphid_dispatch_message_with_capabilities(
         }
         capabilities = (uint8_t)((capabilities &
             (CTAPHID_CAPABILITY_WINK | CTAPHID_CAPABILITY_CBOR)) | CTAPHID_CAPABILITY_NMSG);
-        return finish_response(message, ctaphid_handle_init(
-            message, allocated_channel_id, capabilities,
+        return finish_response(message, ctaphid_handle_init_with_version(
+            message, allocated_channel_id, capabilities, device_version,
             send_report, transport_context));
     }
 
@@ -131,6 +132,14 @@ CtaphidDispatchResult ctaphid_dispatch_message_with_capabilities(
 
     message->has_complete_message = false;
     return CTAPHID_DISPATCH_OK;
+}
+
+CtaphidDispatchResult ctaphid_dispatch_message_with_capabilities(
+    CtaphidReassembler *message, CtaphidChannelManager *channels,
+    uint8_t capabilities, CtaphidSendReport send_report, void *transport_context)
+{
+    return ctaphid_dispatch_message_with_identity(message, channels,
+        capabilities, NULL, send_report, transport_context);
 }
 
 CtaphidDispatchResult ctaphid_dispatch_message(

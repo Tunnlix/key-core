@@ -1,6 +1,5 @@
 #include "protocol/ctaphid_handlers.h"
 #include "protocol/ctaphid_dispatcher.h"
-#include "ctap_device_version.h"
 
 #include <string.h>
 
@@ -8,10 +7,11 @@
  * Capability selection belongs to routing/device configuration. */
 #define CTAPHID_PROTOCOL_VERSION 2U
 
-CtaphidResponseResult ctaphid_handle_init(
+CtaphidResponseResult ctaphid_handle_init_with_version(
     const CtaphidReassembler *message,
     uint32_t allocated_channel_id,
     uint8_t capabilities,
+    const uint8_t device_version[3],
     CtaphidSendReport send_report,
     void *transport_context
 )
@@ -25,12 +25,18 @@ CtaphidResponseResult ctaphid_handle_init(
     response[10] = (uint8_t)(allocated_channel_id >> 8);
     response[11] = (uint8_t)allocated_channel_id;
     response[12] = CTAPHID_PROTOCOL_VERSION;
-    response[13] = CTAP_DEVICE_VERSION_MAJOR;
-    response[14] = CTAP_DEVICE_VERSION_MINOR;
-    response[15] = CTAP_DEVICE_VERSION_BUILD;
+    if (device_version != NULL) memcpy(response + 13U, device_version, 3U);
     response[16] = capabilities;
     return ctaphid_send_response(message->channel_id, CTAPHID_COMMAND_INIT,
         response, sizeof response, send_report, transport_context);
+}
+
+CtaphidResponseResult ctaphid_handle_init(
+    const CtaphidReassembler *message, uint32_t allocated_channel_id,
+    uint8_t capabilities, CtaphidSendReport send_report, void *transport_context)
+{
+    return ctaphid_handle_init_with_version(message, allocated_channel_id,
+        capabilities, NULL, send_report, transport_context);
 }
 
 CtaphidResponseResult ctaphid_handle_ping(

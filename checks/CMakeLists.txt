@@ -1,0 +1,8 @@
+add_executable(core_feature_check core_feature_check.c)
+target_link_libraries(core_feature_check PRIVATE ctap_core)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(core_feature_check PRIVATE -UNDEBUG -Wall -Wextra -Wpedantic -Werror)
+elseif(MSVC)
+    target_compile_options(core_feature_check PRIVATE /UNDEBUG)
+endif()
+add_test(NAME core_features COMMAND core_feature_check)

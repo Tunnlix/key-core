@@ -318,8 +318,8 @@ static CtaphidDeviceResult process_request(CtaphidDevice *device, uint32_t now_m
         device->reassembler.received_length == 0U && device->config.wink_action != NULL) {
         device->config.wink_action(device->config.wink_context, device->active_channel_id);
     }
-    CtaphidDispatchResult dispatched = ctaphid_dispatch_message_with_capabilities(
-        &device->reassembler, &device->channels, capabilities,
+    CtaphidDispatchResult dispatched = ctaphid_dispatch_message_with_identity(
+        &device->reassembler, &device->channels, capabilities, device->config.device_version,
         capture_response, device);
     if (dispatched == CTAPHID_DISPATCH_OK && device->response_count != 0U) {
         finish_queued_response(device);
